@@ -25,3 +25,19 @@ encodeDirect xs = map g $ foldr f [] xs
         | otherwise = (a, 1):(b, c):ys
     g (x, 1) = Single x
     g (x, n) = Multiple n x
+
+dupli :: [a] -> [a]
+dupli [] = []
+dupli xs = concatMap f xs
+  where
+    f a = [a, a]
+
+repli :: [a] -> Int -> [a]
+repli [] n = []
+repli xs n = concatMap f xs
+  where
+    f = replicate n
+
+dropEvery :: [a] -> Int -> [a]
+dropEvery [] n = []
+dropEvery xs n = take (n-1) xs ++ dropEvery (drop n xs) n
