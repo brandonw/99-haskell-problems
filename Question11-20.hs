@@ -41,3 +41,8 @@ repli xs n = concatMap f xs
 dropEvery :: [a] -> Int -> [a]
 dropEvery [] n = []
 dropEvery xs n = take (n-1) xs ++ dropEvery (drop n xs) n
+
+split :: [a] -> Int -> ([a], [a])
+split [] _ = ([], [])
+split xs 0 = ([], xs)
+split (x : xs) n = let (a, b) = split xs (n - 1) in (x : a, b)
