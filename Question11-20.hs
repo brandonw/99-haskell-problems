@@ -46,3 +46,15 @@ split :: [a] -> Int -> ([a], [a])
 split [] _ = ([], [])
 split xs 0 = ([], xs)
 split (x : xs) n = let (a, b) = split xs (n - 1) in (x : a, b)
+
+slice :: [a] -> Int -> Int -> [a]
+slice xs a b = take (b - a + 1) $ drop (a - 1) xs
+
+rotate :: [a] -> Int -> [a]
+rotate [] _         = []
+rotate xs 0         = xs
+rotate l@(x : xs) n = if n > 0 then rotate (xs ++ [x]) (n - 1)
+                               else rotate (last l : init l) (n + 1)
+
+removeAt :: Int -> [a] -> (a, [a])
+removeAt n xs = let (i, j) = splitAt n xs in (last i, init i ++ j)
