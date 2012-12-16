@@ -1,5 +1,6 @@
 import System.Random
 import Control.Monad
+import Data.List
 
 insertAt :: a -> [a] -> Int -> [a]
 insertAt x [] _ = [x]
@@ -50,3 +51,17 @@ rndPermu xs  = rndPermu' xs []
     rndPermu' xs' rs = do
         r <- randomRIO (0, length xs' - 1)
         rndPermu' (take r xs' ++ drop (r + 1) xs') $ xs' !! r : rs
+
+combinations :: Int -> [a] -> [[a]]
+combinations 0 _  = []
+combinations _ [] = []
+combinations n ks
+    | n < 0       = error "Number of elements cannot be < 0"
+    | otherwise   = filter ((n ==) . length) $ subsequences ks
+
+combinations' :: Int -> [a] -> [[a]]
+combinations' 0 _  = []
+combinations' 1 ns = map (:[]) ns
+combinations' k ns = do (x, i) <- zip ns [0..length ns - 1]
+                        map (x:) $ combinations' (k - 1) $
+                                                 take i ns ++ drop (i + 1) ns
