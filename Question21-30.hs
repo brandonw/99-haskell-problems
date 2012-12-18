@@ -83,13 +83,18 @@ lsort = sortBy sort'
 
 type HashTable k v = H.BasicHashTable k v
 
-{-lfsort :: [[a]] -> [[a]]-}
-{-lfsort xss = map fst $ sortBy sortT $ map freqTuple xss-}
-  {-where-}
-    {-sortT (_, t1') (_, t2')-}
-        {-| t1' < t2' = LT-}
-        {-| t1' > t2' = GT-}
-        {-| otherwise = EQ-}
+lfsort :: [[a]] -> [[a]]
+lfsort xss = map fst $ sortBy sortT $ map freqTuple xss
+  where
+    sortT (_, t1') (_, t2')
+        | t1' < t2' = LT
+        | t1' > t2' = GT
+        | otherwise = EQ
+    freqTuple xs = do ht' <- ht
+                      v   <- H.lookup ht' $ length xs
+                      return (xs, fromJust v)
+      where
+        ht = listLengthFreqs xss
 
 listLengthFreqs :: [[a]] -> IO (HashTable Int Int)
 listLengthFreqs []     = H.new
