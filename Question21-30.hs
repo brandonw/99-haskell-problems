@@ -1,6 +1,10 @@
 import System.Random
 import Control.Monad
 import Data.List
+import Data.Maybe
+import Data.Set (Set)
+import qualified Data.Set as Set
+import qualified Data.HashTable.IO as H
 
 insertAt :: a -> [a] -> Int -> [a]
 insertAt x [] _ = [x]
@@ -65,3 +69,34 @@ combinations' 1 ns = map (:[]) ns
 combinations' k ns = do (x, i) <- zip ns [0..length ns - 1]
                         map (x:) $ combinations' (k - 1) $
                                                  take i ns ++ drop (i + 1) ns
+
+lsort :: [[a]] -> [[a]]
+lsort = sortBy sort'
+  where
+    sort' xs ys
+        | lx > ly   = GT
+        | lx < ly   = LT
+        | otherwise = EQ
+          where
+            lx = length xs
+            ly = length ys
+
+type HashTable k v = H.BasicHashTable k v
+
+{-lfsort :: [[a]] -> [[a]]-}
+{-lfsort xss = map fst $ sortBy sortT $ map freqTuple xss-}
+  {-where-}
+    {-sortT (_, t1') (_, t2')-}
+        {-| t1' < t2' = LT-}
+        {-| t1' > t2' = GT-}
+        {-| otherwise = EQ-}
+
+listLengthFreqs :: [[a]] -> IO (HashTable Int Int)
+listLengthFreqs []     = H.new
+listLengthFreqs (x:xs) = do ht <- listLengthFreqs xs
+                            v  <- H.lookup ht l
+                            H.insert ht l $ if isNothing v then 1
+                                                           else 1 + fromJust v
+                            return ht
+  where
+    l = length x
