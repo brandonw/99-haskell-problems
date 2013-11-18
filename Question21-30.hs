@@ -4,13 +4,12 @@ import Data.List
 import Data.Maybe
 import Data.Set (Set)
 import qualified Data.Set as Set
-import qualified Data.HashTable.IO as H
 
 insertAt :: a -> [a] -> Int -> [a]
 insertAt x [] _ = [x]
 insertAt x l@(y : ys) i
-    | i <= 0    = error "index must be one or greater"
-    | i == 1    = x : l
+    | i < 0     = error "index must be zero or greater"
+    | i == 0    = x : l
     | otherwise = y : insertAt x ys (i - 1)
 
 range :: Int -> Int -> [Int]
@@ -80,28 +79,3 @@ lsort = sortBy sort'
           where
             lx = length xs
             ly = length ys
-
-type HashTable k v = H.BasicHashTable k v
-
-lfsort :: [[a]] -> [[a]]
-lfsort xss = map fst $ sortBy sortT $ map freqTuple xss
-  where
-    sortT (_, t1') (_, t2')
-        | t1' < t2' = LT
-        | t1' > t2' = GT
-        | otherwise = EQ
-    freqTuple xs = do ht' <- ht
-                      v   <- H.lookup ht' $ length xs
-                      return (xs, fromJust v)
-      where
-        ht = listLengthFreqs xss
-
-listLengthFreqs :: [[a]] -> IO (HashTable Int Int)
-listLengthFreqs []     = H.new
-listLengthFreqs (x:xs) = do ht <- listLengthFreqs xs
-                            v  <- H.lookup ht l
-                            H.insert ht l $ if isNothing v then 1
-                                                           else 1 + fromJust v
-                            return ht
-  where
-    l = length x
